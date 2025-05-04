@@ -1,0 +1,143 @@
+@import url('https://fonts.googleapis.com/css2?family=Gabarito:wght@400;500;600;700&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Gabarito', sans-serif;
+}
+
+body {
+  background-color: #e6edf3;
+}
+
+.info_data_container {
+  padding: 0;
+  background-color: #ffffff;
+  min-height: 100vh;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.info-page-header {
+  padding: 12px 20px;
+  background-color: white;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.info-page-header h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.info-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+
+.dog-profile {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  background-color: white;
+}
+
+.dog-image {
+  max-width: 200px;
+  max-height: 150px;
+  margin-right: 0px;
+}
+
+
+.dog-image img{
+    max-width: 150px;
+    max-height: 150px;
+    
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    margin-right: 15px;
+  }
+  
+
+.dog-details h2 {
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.dog-details p {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.info-cards {
+  display: flex;
+  flex-direction: column;
+}
+
+.info-card {
+  display: flex;
+  align-items: center;
+  padding: 15px 20px;
+  background-color: white;
+  border-top: solid 1px;
+}
+
+.info-label {
+  font-weight: 500;
+  flex: 1;
+}
+
+.info-value {
+  font-weight: 600;
+  margin-right: 15px;
+}
+
+.wifi-icon, .battery-icon, .location-icon {
+
+  font-size: 24px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+
+
+.navigation {
+  display: flex;
+  justify-content: space-around;
+  padding: 10px 0;
+  background-color: white;
+  border-top: 1px solid #eee;
+  margin-top: auto;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 33.33%;
+  color: #666;
+  font-size: 0.8rem;
+}
+
+.nav-item.active {
+  color: black;
+}
+
+.home-icon, .dog-icon, .settings-icon {
+  width: 24px;
+  height: 24px;
+  margin-bottom: 4px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}

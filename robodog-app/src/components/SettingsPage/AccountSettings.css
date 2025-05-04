@@ -1,0 +1,21 @@
+
+.robodog-back-button {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.robodog-back-arrow-acc {
+  font-size: 24px;
+  color: #000000;
+  margin-bottom: -50px;
+
+}
+.robodog-settings-subtitle-acc {
+    text-align: center;
+    font-size: 1.4rem;
+    margin-top: 15px;
+    color: black;
+    font-weight: 500;
+  }
+  

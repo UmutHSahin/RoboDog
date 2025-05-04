@@ -1,0 +1,83 @@
+@import url('https://fonts.googleapis.com/css2?family=Gabarito:wght@400;500;600;700&display=swap');
+
+.data-page-wrapper {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.data-content-wrapper {
+  flex: 1;
+  padding-bottom: 60px;
+}
+
+.data-main-container {
+  background-color: white;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+  font-family: 'Gabarito', sans-serif;
+}
+
+.data-main-title {
+  text-align: center;
+  margin: 13px 0px;
+  color: black;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+}
+
+
+
+.data-subtitle {
+  text-align: center;
+  font-size: 1.4rem;
+  margin-bottom: 20px;
+  color: black;
+}
+
+.data-items-container {
+  display: flex; 
+  flex-direction: column;
+  gap: 15px;
+}
+
+.data-single-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 20px;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.data-item-label {
+  font-weight: 500;
+  color: black;
+}
+
+.data-item-value {
+  color: black;
+}
+
+.data-page-wrapper > nav,
+.data-page-wrapper > div:last-child {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+.robodog-settings-subtitle-data {
+  text-align: center;
+  font-size: 1.4rem;
+  margin-top: 15px;
+  color: black;
+  font-weight: 500;
+}
+
+.robodog-back-arrow-data {
+  font-size: 24px;
+  color: #000000;
+  margin-bottom: -60px;
+
+}

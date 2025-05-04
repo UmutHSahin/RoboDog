@@ -1,0 +1,98 @@
+/* SettingsMain.css */
+.robodog-settings-container {
+  max-width: 500px;
+  margin: 0 auto;
+  background-color: #f0f4f8;
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.robodog-settings-header {
+  padding: 10px;
+  background-color: #f0f4f8;
+}
+
+.robodog-settings-status-bar {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #333;
+}
+
+.robodog-time {
+  font-weight: bold;
+}
+
+.robodog-status-icons {
+  display: flex;
+  gap: 5px;
+}
+
+.robodog-settings-content {
+  flex: 1;
+  background-color: white;
+  border-radius: 10px 10px 0 0;
+  overflow: hidden;
+}
+
+.robodog-settings-appname {
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+  text-align: center;
+}
+
+.robodog-header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.robodog-settings-appname-text {
+  text-align: center;
+  margin: 0;
+  color: #333;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.robodog-settings-subtitle {
+  text-align: center;
+  margin: 5px 0 0;
+  color: #333;
+  font-size: 1rem;
+  font-weight: normal;
+}
+
+.robodog-back-button {
+  width: 30px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.robodog-back-arrow {
+  font-size: 24px;
+  color: #007aff;
+}
+
+.robodog-placeholder {
+  width: 30px;
+}
+
+.robodog-settings-option {
+  display: flex;
+  justify-content: space-between;
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+}
+
+.robodog-settings-option-text {
+  font-size: 16px;
+}
+
+.robodog-settings-option-arrow {
+  color: #999;
+  font-size: 20px;
+}

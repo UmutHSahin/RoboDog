@@ -1,0 +1,113 @@
+.robodog-popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .robodog-popup {
+    background-color: white;
+    border-radius: 10px;
+    padding: 20px;
+    width: 90%;
+    max-width: 350px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .robodog-popup-title {
+    font-size: 18px;
+    margin: 0 0 20px;
+    text-align: center;
+    color: #333;
+  }
+  
+  .robodog-popup-error {
+    color: #ff3b30;
+    text-align: center;
+    margin-bottom: 15px;
+    font-size: 14px;
+  }
+  
+  .robodog-popup-field {
+    margin-bottom: 15px;
+  }
+  
+  .robodog-popup-field label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 14px;
+    color: #555;
+  }
+  
+  .robodog-popup-field input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+    box-sizing: border-box;
+  }
+  
+  .robodog-popup-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+  }
+  
+  .robodog-popup-cancel,
+  .robodog-popup-confirm {
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    flex: 1;
+    margin: 0 5px;
+  }
+  
+  .robodog-popup-cancel {
+    background-color: #f0f0f0;
+    color: #333;
+  }
+  
+  .robodog-popup-confirm {
+    background-color: #000000;
+    color: white;
+  }
+
+  /* Add these styles to your Popups.css file */
+
+.password-input-container {
+    position: relative;
+    width: 100%;
+  }
+  
+  .password-input-container input {
+    width: 100%;
+    padding-right: 35px; /* Make room for the eye icon */
+  }
+  
+  .password-toggle-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    user-select: none;
+    font-size: 18px;
+    color: #555;
+  }
+  
+  .robodog-popup-success {
+    color: #4cd964;
+    text-align: center;
+    margin: 15px 0;
+    font-size: 16px;
+    font-weight: 500;
+  }
