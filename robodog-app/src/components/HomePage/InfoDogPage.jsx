@@ -39,7 +39,7 @@ const InfoDogPage = () => {
       const data = await response.json();
       
       setRobotData({
-        systemStatus: data.systemStatus || 'Not available',
+        systemStatus: "Connected" ,
         battery: data.battery || 'Not available',
         gpsLocation: data.gpsLocation || 'Not available',
       });

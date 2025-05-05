@@ -1,51 +1,57 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 import "./DataDisplay.css";
-import NavBar from '../NavBar/navbar';
+import NavBar from "../NavBar/navbar";
+import axios from 'axios';
 
 const DataDisplay = () => {
   const navigate = useNavigate();
   const [espIP, setEspIP] = useState("");
   const [showNoIPModal, setShowNoIPModal] = useState(false);
-  const [robotData, setRobotData] = useState({
-    "GPS Location": "Loading...",
-    "Battery": "Loading...",
-    "IMU": "Loading...",
-    "Pressure": "Loading...",
-    "Temperature": "Loading...",
+  const [sensorData, setSensorData] = useState({
+    gpsLocation: "Loading...",
+    battery: "Loading...",
+    imu: "Loading...",
+    pressure: "Loading...",
+    temperature: "Loading...",
+    systemStatus: "Connecting...",
   });
 
+  // Handle back button
   const handleBack = () => {
     window.history.back();
   };
 
   const fetchRobotData = async () => {
-    if (!espIP) return;
-    
-    try {
+    const ipAddress = localStorage.getItem("espIP");
+    if (!ipAddress) {
+      navigate('/connect');
+      return;
+    }
 
-      const response = await fetch(`http://${espIP}/sensor-data`);
-      const data = await response.json();
-      setRobotData({
-        "GPS Location": data.gpsLocation || "Not available",
-        "Battery": data.battery || "Not available",
-        "IMU": data.imu || "Not available",
-        "Pressure": data.pressure || "Not available",
-        "Temperature": data.temperature || "Not available",
+    try {
+      const response = await axios.get(`http://${ipAddress}/sensor-data`);
+      const data = response.data;
+
+      setSensorData({
+        systemStatus: "Connected",
+        gpsLocation: data.gpsLocation || "Not available",
+        battery: data.battery || "Not available",
+        imu: data.imu || "Not available",
+        pressure: data.pressure || "Not available",
+        temperature: data.temperature || "Not available",
       });
     } catch (error) {
       console.error("Error fetching data:", error);
-
-      setRobotData(prevData => ({
-        ...prevData,
-        "System Status": "Connection Error"
+      setSensorData(prev => ({
+        ...prev,
+        systemStatus: "Connection Error",
       }));
     }
   };
 
   useEffect(() => {
-    const storedIP = localStorage.getItem('espIP');
-    
+    const storedIP = localStorage.getItem("espIP");
     if (storedIP) {
       setEspIP(storedIP);
     } else {
@@ -55,15 +61,15 @@ const DataDisplay = () => {
 
   useEffect(() => {
     if (espIP) {
-      fetchRobotData();
-      const interval = setInterval(fetchRobotData, 3000);
-      return () => clearInterval(interval);
+      fetchRobotData(); // İlk veri çekme
+      const interval = setInterval(fetchRobotData, 3000); // 3 saniyede bir çek
+      return () => clearInterval(interval); // Unmount durumunda temizle
     }
   }, [espIP]);
 
   const handleNavigateToConnect = () => {
     setShowNoIPModal(false);
-    navigate('/connect');
+    navigate("/connect");
   };
 
   return (
@@ -83,14 +89,14 @@ const DataDisplay = () => {
               <h2 className="robodog-settings-subtitle-data">Robot Data</h2>
             </div>
           </div>
-          
+
           <div className="data-items-container">
-            {Object.entries(robotData).map(([key, value]) => (
-              <div className="data-single-item" key={key}>
-                <span className="data-item-label">{key}</span>
-                <span className="data-item-value">{value}</span>
-              </div>
-            ))}
+            <div className="data-single-item"><strong>System Status:</strong> {sensorData.systemStatus}</div>
+            <div className="data-single-item"><strong>GPS Location:</strong> {sensorData.gpsLocation}</div>
+            <div className="data-single-item"><strong>Battery:</strong> {sensorData.battery}</div>
+            <div className="data-single-item"><strong>IMU:</strong> {sensorData.imu}</div>
+            <div className="data-single-item"><strong>Pressure:</strong> {sensorData.pressure}</div>
+            <div className="data-single-item"><strong>Temperature:</strong> {sensorData.temperature} °C</div>
           </div>
         </div>
       </div>
