@@ -49,12 +49,11 @@ const ConnectDogPage = () => {
     try {
       setIsLoading(true);
       
-      // Store the IP in localStorage for future use
       localStorage.setItem('espIP', ipAddress);
       
-      // Navigate to the info page
       navigate('/info');
     } catch (error) {
+      
       console.error('Error connecting to dog:', error);
       setErrorMessage('Error connecting to dog. Please try again.');
       setShowError(true);

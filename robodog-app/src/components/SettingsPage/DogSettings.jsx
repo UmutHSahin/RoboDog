@@ -3,57 +3,74 @@ import { useNavigate } from 'react-router-dom';
 import './DogSettings.css';
 import ChangeDogNamePopup from './ChangeDogNamePopup';
 import NavBar from '../NavBar/navbar';
-import axios from 'axios';
+import axios from 'axios';  ///Https istekleri için
 
 const DogSettings = ({ onBack }) => {
+
   const [showNamePopup, setShowNamePopup] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  const handleChangeName = () => {
+  const handleChangeName = () => {//Change Dog Name butonuna basınca popupu açmak için
+
     setShowNamePopup(true);
+
   };
 
-  const handleDisconnect = () => {
+  const handleDisconnect = () => { //Disconnect seçeneği tıknanırsa Ip adresini siip connecte atar 
+
     localStorage.removeItem('espIP');
     navigate('/connect');
+
   };
 
-  const handleViewRobotData = () => {
+  const handleViewRobotData = () => { //Robot data butonun tıklayınca robot vreisini gösteren sayfaya yönlendirmek için
+
     navigate('/robotData');
+
   };
 
   const handleNameSubmit = async (newName) => {
-    const ipAddress = localStorage.getItem('espIP');
+
+    const ipAddress = localStorage.getItem('espIP'); /// Ip adresini localden alır
     
     if (!ipAddress) {
+
       navigate('/connect');
       return;
+
     }
     
     try {
-      setIsLoading(true);
+
+      setIsLoading(true);  
       
-      // Call the API to update the dog name
+      //Burda yeni ismi kullanıcıdan aldıktan sonra put ile Ip adresini içeren puta yolluyor 
       const response = await axios.put('https://localhost:44374/api/Dog/UpdateDogName', {
         IpAddress: ipAddress,
         Name: newName
+
       });
       
-      setShowNamePopup(false);
+      setShowNamePopup(false); //okay olduktan sonra pupop ı kapatıyor
       
-      // Navigate back to info page to see the updated name
+
       navigate('/info');
+
     } catch (err) {
+
       console.error('Error updating dog name:', err);
       setError('Failed to update dog name. Please try again.');
+
     } finally {
+
       setIsLoading(false);
     }
   };
 
   return (
+
     <div className="robodog-settings-content">
       <div className="robodog-settings-appname">
         <div className="robodog-header-container">

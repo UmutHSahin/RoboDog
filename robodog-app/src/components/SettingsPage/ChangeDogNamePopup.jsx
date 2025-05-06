@@ -2,24 +2,33 @@ import React, { useState, useEffect } from 'react';
 import './Popups.css';
 
 const ChangeDogNamePopup = ({ onClose, onSubmit, isNewDog = false, isLoading = false }) => {
-  const [dogName, setDogName] = useState('');
+  
+  const [dogName, setDogName] = useState('');  // dogName adında bir state tanımlanıyor, başlangıçta isim yok
   const [error, setError] = useState('');
 
+
   useEffect(() => {
-    // Focus the input field when the popup opens
+
+
+  // dogName adında bir state tanımlanıyor, başlangıçta isim yok
+
     document.getElementById('dogNameInput')?.focus();
+
   }, []);
 
-  const handleSubmit = () => {
+  const handleSubmit = () => {    // Form gönderim işlemi (butona basılınca çalışıyor)
+
     if (!dogName.trim()) {
+
       setError('Dog name cannot be empty');
       return;
     }
 
-    onSubmit(dogName);
+    onSubmit(dogName);//Eğer isim geçerliyse ismi atar
   };
 
   return (
+
     <div className="robodog-popup-overlay">
       <div className="robodog-popup">
         <h2 className="robodog-popup-title">
@@ -36,7 +45,9 @@ const ChangeDogNamePopup = ({ onClose, onSubmit, isNewDog = false, isLoading = f
             id="dogNameInput"
             type="text"
             value={dogName}
-            onChange={(e) => {
+
+            onChange={(e) => {        // Kullanıcı yazdıkça dogName güncelleniyor
+
               setDogName(e.target.value);
               setError('');
             }}

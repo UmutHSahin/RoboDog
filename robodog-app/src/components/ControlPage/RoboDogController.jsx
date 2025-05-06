@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';   //useRef --- DOM elemanlarına veya Değişkenlere referans tutmak için kullanılıyor
 import { useNavigate } from 'react-router-dom';
 import { FaHome, FaCog } from 'react-icons/fa';
 import { RiArrowLeftSLine, RiArrowRightSLine, RiArrowUpSLine, RiArrowDownSLine } from 'react-icons/ri';
@@ -8,30 +8,36 @@ import NavBar from '../../components/NavBar/navbar';
 
 const RoboDogController = () => {
   const navigate = useNavigate();
-  const [cameraConnected, setCameraConnected] = useState(true);
-  const [cameraEnabled, setCameraEnabled] = useState(true);
-  const [selectedSpeed, setSelectedSpeed] = useState('medium');
-  const [powerOn, setPowerOn] = useState(true);
-  const [espIP, setEspIP] = useState("");
-  const [showNoIPModal, setShowNoIPModal] = useState(false);
-  const [micActive, setMicActive] = useState(false); // State to track if microphone is active
-  const [listeningText, setListeningText] = useState(""); // For feedback when listening
+  const [cameraConnected, setCameraConnected] = useState(true); //Kamera bağlantı durumunu tutar
+  const [cameraEnabled, setCameraEnabled] = useState(true); ///Kamera açık/kapalı durumunu tutar
+  const [selectedSpeed, setSelectedSpeed] = useState('medium');  //Robotun huz sevyesini tutar
+  const [powerOn, setPowerOn] = useState(true);// rOBOTTA güç varmı yokmu ona bakar
+  const [espIP, setEspIP] = useState(""); //Robotun IP sini tutar
+  const [showNoIPModal, setShowNoIPModal] = useState(false); //Ip girilmemişse gösterilecek olan şeyleri tutar
+  const [micActive, setMicActive] = useState(false);   // mikdorofn açıkmı değilmi onu tutar
+  const [listeningText, setListeningText] = useState(""); //mikrofon dinlerken dinlenilen textleri tutuar
 
-  const wsCamera = useRef(null);
+  const wsCamera = useRef(null); //Kamera WebSocket bağlantısını tutar
   const cameraImageRef = useRef(null);
-  const recognitionRef = useRef(null);
+  const recognitionRef = useRef(null);  //Konuşma tanıma (SpeechRecognition) nesnesini tutar
 
-  useEffect(() => {
+  useEffect(() => {   //Sayfa yüklendiğinde Ip varmı oan bakar yoksa  setShowNoIPModal döndürür
+
     const storedIP = localStorage.getItem('espIP');
     
     if (storedIP) {
+
       setEspIP(storedIP);
+
+
     } else {
+
       setShowNoIPModal(true);
     }
 
-    // Initialize speech recognition
-    if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+    
+    if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {  // konuşma tanıma desteği ile alakalı ama şuan çalışmıyor sonra bakıcam
+
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       recognitionRef.current = new SpeechRecognition();
       recognitionRef.current.continuous = true;
@@ -39,10 +45,11 @@ const RoboDogController = () => {
       recognitionRef.current.lang = 'en-US';
 
       recognitionRef.current.onresult = (event) => {
+
         const transcript = event.results[event.results.length - 1][0].transcript.toLowerCase();
         setListeningText(`Heard: ${transcript}`);
         
-        // Process voice commands
+       
         if (transcript.includes('forward') || transcript.includes('go forward') || transcript.includes('move forward')) {
           handleForward();
         } else if (transcript.includes('back') || transcript.includes('backward') || transcript.includes('go back')) {
@@ -66,37 +73,45 @@ const RoboDogController = () => {
         } else if (transcript.includes('camera on') || transcript.includes('turn on camera')) {
           if (!cameraEnabled) handleCameraToggle();
         } else if (transcript.includes('stop listening') || transcript.includes('turn off microphone')) {
-          handleMicToggle(); // This will toggle off the microphone
+          handleMicToggle(); 
         }
 
-        // Clear the feedback after 3 seconds
+        
         setTimeout(() => {
           setListeningText("");
         }, 3000);
       };
 
       recognitionRef.current.onerror = (event) => {
+
         console.error('Speech recognition error', event.error);
+
         if (event.error === 'no-speech') {
-          // Continue listening if no speech is detected
+          
           if (micActive && recognitionRef.current) {
+
             try {
+
               recognitionRef.current.start();
+
             } catch (e) {
+
               console.log('Recognition already started');
             }
           }
         } else {
+
           setMicActive(false);
           setListeningText("Error: " + event.error);
           setTimeout(() => {
             setListeningText("");
           }, 3000);
+
         }
       };
 
       recognitionRef.current.onend = () => {
-        // Restart if still active
+        
         if (micActive && recognitionRef.current) {
           try {
             recognitionRef.current.start();
@@ -116,19 +131,27 @@ const RoboDogController = () => {
     };
   }, []);
 
+
+
   useEffect(() => {
+
+
     const connectWebSockets = () => {
-      if (!espIP || !cameraEnabled) return;
+
+      if (!espIP || !cameraEnabled) return; ///Kamera WebSocket bağlantısını kuruyor
       
       wsCamera.current = new WebSocket(`ws://${espIP}/Camera`);
       wsCamera.current.binaryType = 'blob';
       
       wsCamera.current.onopen = () => {
+
         console.log("Camera WebSocket connected");
         setCameraConnected(true);
+
       };
 
       wsCamera.current.onclose = () => {
+
         console.log("Camera WebSocket disconnected");
         setCameraConnected(false);
 
@@ -138,51 +161,71 @@ const RoboDogController = () => {
       };
       
       wsCamera.current.onmessage = (event) => {
+
         if (cameraImageRef.current && event.data instanceof Blob) {
+
+          //WebSocket'ten gelen kamera görüntüsünü <img> elemanına yerleştirir.
+
           cameraImageRef.current.src = URL.createObjectURL(event.data);
           setCameraConnected(true);
+
         }
       };
     };
     
     if (powerOn && espIP && cameraEnabled) {
+
       connectWebSockets();
+
     }
     
     return () => {
+
       if (wsCamera.current) wsCamera.current.close();
+
     };
   }, [powerOn, espIP, cameraEnabled]);
 
   const handleDisconnect = () => {
+
     localStorage.removeItem('espIP');
     navigate('/connect');
+
   };
 
   const handleCameraToggle = () => {
+
     if (!powerOn) return;
     const newCameraState = !cameraEnabled;
     
     if (!newCameraState && wsCamera.current) {
+
       wsCamera.current.close();
       setCameraConnected(false);
+
     }
     
     setCameraEnabled(newCameraState);
     
     if (newCameraState && espIP) {
+
       setTimeout(() => {
+
         if (wsCamera.current) wsCamera.current.close();
         wsCamera.current = null;
         
         wsCamera.current = new WebSocket(`ws://${espIP}/Camera`);
         wsCamera.current.binaryType = 'blob';
         wsCamera.current.onopen = () => {
+
           console.log("Camera WebSocket reconnected");
           setCameraConnected(true);
+
         };
         wsCamera.current.onmessage = (event) => {
+
           if (cameraImageRef.current && event.data instanceof Blob) {
+
             cameraImageRef.current.src = URL.createObjectURL(event.data);
           }
         };
@@ -191,74 +234,100 @@ const RoboDogController = () => {
   };
 
   const handleForward = () => {
+
     if (!powerOn || !espIP) return;
+
     console.log("Moving forward");
     
     fetch(`http://${espIP}/forward`)
+
       .then(response => {
+
         if (response.ok) {
+
           console.log("Forward command sent successfully");
+
         } else {
+
           console.error("Failed to send forward command");
         }
       })
       .catch(error => {
+
         console.error("Error sending forward command:", error);
       });
   };
   
   const handleBack = () => {
+
     if (!powerOn || !espIP) return;
     console.log("Moving backward");
     
     fetch(`http://${espIP}/back`)
       .then(response => {
+
         if (response.ok) {
+
           console.log("Back command sent successfully");
         } else {
+
           console.error("Failed to send back command");
         }
       })
       .catch(error => {
+
         console.error("Error sending back command:", error);
       });
   };
   
   const handleLeft = () => {
+
     if (!powerOn || !espIP) return;
     console.log("Moving left");
     
     fetch(`http://${espIP}/left`)
+
       .then(response => {
+
         if (response.ok) {
+
           console.log("Left command sent successfully");
         } else {
+
           console.error("Failed to send left command");
         }
       })
       .catch(error => {
+
         console.error("Error sending left command:", error);
       });
   };
   
   const handleRight = () => {
+
     if (!powerOn || !espIP) return;
     console.log("Moving right");
     
     fetch(`http://${espIP}/right`)
+
       .then(response => {
+
         if (response.ok) {
+
           console.log("Right command sent successfully");
         } else {
+
           console.error("Failed to send right command");
         }
       })
       .catch(error => {
+
         console.error("Error sending right command:", error);
       });
   };
 
   const handleSpeedClick = (speed) => {
+
     if (!powerOn || !espIP) return;
     setSelectedSpeed(speed);
     console.log(`Speed set to ${speed}`);
@@ -266,10 +335,14 @@ const RoboDogController = () => {
     const speedValue = speed === 'slow' ? 50 : speed === 'medium' ? 150 : 255;
     
     fetch(`http://${espIP}/message?text=speed:${speedValue}`)
+
       .then(response => {
+
         if (response.ok) {
+
           console.log(`Speed ${speed} (${speedValue}) sent successfully`);
         } else {
+
           console.error("Failed to send speed command");
         }
       })
@@ -279,16 +352,19 @@ const RoboDogController = () => {
   };
 
   const handlePowerToggle = () => {
+
     const newPowerState = !powerOn;  
     setPowerOn(newPowerState);
     console.log(`Power ${newPowerState ? 'on' : 'off'}`);
     
     if (!newPowerState) {
+
       if (wsCamera.current) wsCamera.current.close();
       setCameraConnected(false);
       
-      // Also turn off microphone if it's active when power is turned off
+      
       if (micActive) {
+
         try {
           recognitionRef.current?.abort();
           setMicActive(false);
@@ -341,7 +417,7 @@ const RoboDogController = () => {
     console.log(`Microphone ${newMicState ? 'activated' : 'deactivated'}`);
     
     if (newMicState) {
-      // Start speech recognition
+      
       setListeningText("Listening for commands...");
       if (recognitionRef.current) {
         try {
@@ -351,7 +427,7 @@ const RoboDogController = () => {
         }
       }
     } else {
-      // Stop speech recognition
+      
       setListeningText("");
       if (recognitionRef.current) {
         try {
@@ -362,7 +438,7 @@ const RoboDogController = () => {
       }
     }
     
-    // Still send the toggle command to the robot
+    
     fetch(`http://${espIP}/message?text=mic:toggle`)
       .then(response => {
         if (response.ok) {

@@ -5,22 +5,29 @@ import ChangePasswordPopup from './ChangePasswordPopup';
 import NavBar from '../NavBar/navbar';
 
 const AccountSettings = ({ onBack }) => {
-  const [showPasswordPopup, setShowPasswordPopup] = useState(false);
 
-  const handleChangePassword = () => {
+  const [showPasswordPopup, setShowPasswordPopup] = useState(false);  //Burda şifre değiştirme popupının başlangıçta false yapıyor ki gerektiğinde açabilsin
+
+  const handleChangePassword = () => {  //Şifte değişrime butonuna tıkalınca popupı ortaya çıkaran fonksiyon bu
+
     setShowPasswordPopup(true);
+
   };
 
   const handleLogout = () => {
-    // Logout logic here
+
     window.location.href = '/';
   };
 
   const handlePasswordSubmit = (oldPassword, newPassword) => {
-    // Submit password change to backend
+
+    //Burada şifre değiştirme popuında açıldığında şifreleri değiştir butonuna tıklayınca çalışacak fonksiyon bu 
+    //Bu fonksiyon eski şifre ile yeni şifreyi konsola yazdırıyor 
+
     console.log('Changing password:', { oldPassword, newPassword });
     setShowPasswordPopup(false);
-    // Add API call here
+
+
   };
 
   return (
