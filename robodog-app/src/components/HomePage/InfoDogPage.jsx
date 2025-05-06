@@ -19,7 +19,7 @@ const InfoDogPage = () => {
 
   const [robotData, setRobotData] = useState({
     systemStatus: 'Loading...',
-    battery: 'Loading...',
+    batteryPercentage: 'Loading...',
     gpsLocation: 'Loading...',
   });
 
@@ -40,11 +40,22 @@ const InfoDogPage = () => {
       const response = await fetch(`http://${ipAddress}/sensor-data`);  //Esp32 den verileri çekiyor
       const data = await response.json();
       
+      let gpsLocation = "Not available";
+      if (data.latitude !== undefined && data.longitude !== undefined ) {
+        gpsLocation = {
+          latitude: data.latitude,
+          longitude: data.longitude,
+          altitude: data.altitude || 0
+        };
+        // JSON formatında gösterme (isteğe bağlı)
+        gpsLocation = JSON.stringify(gpsLocation);
+      }
+
       setRobotData({   //Burada bağlandıktan sorna hangi değerler göüksün o yazıyor eğer değere ulaşılamazsa not available yazacak
 
         systemStatus: "Connected" ,
-        battery: data.battery || 'Not available',
-        gpsLocation: data.gpsLocation || 'Not available',
+        batteryPercentage: data.batteryPercentage || 'Not available',
+        gpsLocation: gpsLocation,
 
       });
     } catch (error) {
@@ -232,7 +243,7 @@ const InfoDogPage = () => {
                 <div className="wifi-icon"><IoWifi /></div>
               </div>
               <div className="info-card">
-                <div className="info-label">Battery: {robotData.battery}</div>
+                <div className="info-label">Battery: {robotData.batteryPercentage}</div>
                 <div className="battery-icon"><IoIosBatteryFull /></div>
               </div>
               <div 

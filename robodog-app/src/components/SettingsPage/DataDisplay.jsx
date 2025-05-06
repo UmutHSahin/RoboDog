@@ -10,11 +10,13 @@ const DataDisplay = () => {
   const [showNoIPModal, setShowNoIPModal] = useState(false);  //Robotun Ip addresini tutmak için kullanrız
   const [sensorData, setSensorData] = useState({
     gpsLocation: "Loading...",
-    battery: "Loading...",
+    batteryPercentage: "Loading...",
     imu: "Loading...",
     pressure: "Loading...",
     temperature: "Loading...",
     systemStatus: "Connecting...",
+    servoAngles: "Loading...",
+    legStates: "Loading...",
   });
 
 
@@ -37,14 +39,37 @@ const DataDisplay = () => {
       const response = await axios.get(`http://${ipAddress}/sensor-data`); //Burada girilen Ip adresine sensör verilerini çekebilmek için istek yolluyor 
       const data = response.data;
 
+
+
+      let gpsLocation = "Not available";
+      if (data.latitude !== undefined && data.longitude !== undefined ) {
+        gpsLocation = {
+          latitude: data.latitude,
+          longitude: data.longitude,
+          altitude: data.altitude || 0
+        };
+        // JSON formatında gösterme (isteğe bağlı)
+        gpsLocation = JSON.stringify(gpsLocation);
+      }
+
+      // IMU bilgilerini de birleştir
+      let imuData = "Not available";
+      if (data.yaw !== undefined && data.pitch !== undefined && data.roll !== undefined) {
+        imuData = `Yaw: ${data.yaw}°, Pitch: ${data.pitch}°, Roll: ${data.roll}°`;
+      }
+
+
       setSensorData({ // sensör verileri ayrıştırılıp eğer veriye ulaşamamışsa not available diyor
 
         systemStatus: "Connected",
-        gpsLocation: data.gpsLocation || "Not available",
-        battery: data.battery || "Not available",
-        imu: data.imu || "Not available",
+        gpsLocation: gpsLocation,
+        batteryPercentage: data.batteryPercentage || "Not available",
+        imu: imuData,
         pressure: data.pressure || "Not available",
         temperature: data.temperature || "Not available",
+        servoAngles:data.servoAngles || "Not available",
+        legStates:data.legStates || "Not available",
+
       });
 
     } catch (error) {
@@ -123,11 +148,13 @@ const DataDisplay = () => {
               
             <div className="data-single-item"><strong>System Status:</strong> {sensorData.systemStatus}</div>
             <div className="data-single-item"><strong>GPS Location:</strong> {sensorData.gpsLocation}</div>
-            <div className="data-single-item"><strong>Battery:</strong> {sensorData.battery}</div>
+            <div className="data-single-item"><strong>Battery:</strong> {sensorData.batteryPercentage}</div>
             <div className="data-single-item"><strong>IMU:</strong> {sensorData.imu}</div>
             <div className="data-single-item"><strong>Pressure:</strong> {sensorData.pressure}</div>
             <div className="data-single-item"><strong>Temperature:</strong> {sensorData.temperature} °C</div>
-          
+            <div className="data-single-item"><strong>Servo Angles:</strong> {sensorData.servoAngles} </div>
+            <div className="data-single-item"><strong>Leg States:</strong> {sensorData.legStates} </div>
+
           
           
           </div>
