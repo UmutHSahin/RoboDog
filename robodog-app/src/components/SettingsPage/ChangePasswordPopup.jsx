@@ -1,168 +1,115 @@
-import { useState } from 'react';
-import './Popups.css';
+import { useState, HashRouter as Router, Route, Routes  } from 'react';
+import axios from 'axios';
+import './ChangePasswordPopup.css';
+import NavBar from '../NavBar/navbar';
 
-const ChangePasswordPopup = ({ onClose, userEmail }) => {
-  const [oldPassword, setOldPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+
+const ChangePasswordPopup = ({ onBack }) => {
+  const [email, setEmail] = useState('');
+  const [message, setMessage] = useState('');
   const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [showOldPassword, setShowOldPassword] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     setError('');
-    
-    if (!oldPassword || !newPassword || !confirmPassword) {
-      setError('All fields are required');
-      return;
-    }
-    
-    if (newPassword !== confirmPassword) {
-      setError('New passwords do not match');
+    setMessage('');
+
+    if (!email) {
+      setError('Please enter your email address');
       return;
     }
 
-    if (newPassword.length < 6) {
-      setError('New password must be at least 6 characters');
-      return;
-    }
-    
     try {
-      setIsLoading(true);
-      
-      const response = await fetch('https://localhost:44374/api/Password/ChangePassword', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: userEmail,
-          oldPassword: oldPassword,
-          newPassword: newPassword
-        }),
-        credentials: 'include' 
+      setLoading(true);
+      const baseUrl = window.location.origin;
+
+      const response = await axios.post('https://localhost:44374/api/Password/ForgotPassword', {
+        email: email,
+        baseUrl: baseUrl,
       });
-      
-      const responseText = await response.text();
-      
-      if (!response.ok) {
-        try {
-          const errorData = responseText ? JSON.parse(responseText) : {};
-          throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
-        } catch (e) {
-          throw new Error(responseText || `HTTP error! status: ${response.status}`);
-        }
-      }
-      
-      const data = responseText ? JSON.parse(responseText) : {};
-      
-      if (data.success) {
-        setSuccess(true);
-        setTimeout(() => onClose(), 2000);
-      } else {
-        setError(data.message || 'Failed to change password');
+
+      if (response.data.success) {
+        setMessage('Reset instructions sent. Please check your email.');
       }
     } catch (err) {
-      console.error('Password change error:', err);
-      setError(err.message || 'Failed to change password. Please try again.');
+      if (err.response && err.response.data) {
+        if (typeof err.response.data === 'string') {
+          setError(err.response.data);
+        } else if (err.response.data.message) {
+          setError(err.response.data.message);
+        } else if (err.response.data.Message) {
+          setError(err.response.data.Message);
+        } else if (err.response.data.ExceptionMessage) {
+          setError(err.response.data.ExceptionMessage);
+        } else {
+          setError('An error occurred. Please try again.');
+        }
+      } else {
+        setMessage('Forgot Password Link Sent To Your Mail Please Check Your Mail');
+      }
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
-  const toggleOldPasswordVisibility = () => setShowOldPassword(!showOldPassword);
-  const toggleNewPasswordVisibility = () => setShowNewPassword(!showNewPassword);
-  const toggleConfirmPasswordVisibility = () => setShowConfirmPassword(!showConfirmPassword);
-
   return (
-    <div className="robodog-popup-overlay">
-      <div className="robodog-popup">
-        <h2 className="robodog-popup-title">Change Password</h2>
-        
-        {success ? (
-          <div className="robodog-popup-success">
-            Password changed successfully!
+    <div className="pwd-settings-content">
+            <div className="robodog-settings-appname">
+        <div className="robodog-header-container">
+          <div className="robodog-back-button" onClick={onBack}></div>
+          <h1 className="robodog-settings-appname-text">RoboDog</h1>
+          <div className="robodog-placeholder"></div>
+        </div>
+
+        <div>
+          <div className="robodog-back-button" onClick={onBack}>
+            <span className="robodog-back-arrow-acc">‹</span>
           </div>
-        ) : (
-          <>
-            {error && <div className="robodog-popup-error">{error}</div>}
-            
-            <div className="robodog-popup-field">
-              <label>Current Password</label>
-              <div className="password-input-container">
-                <input 
-                  type={showOldPassword ? "text" : "password"}
-                  value={oldPassword}
-                  onChange={(e) => setOldPassword(e.target.value)}
-                  placeholder="Enter current password"
-                />
-                <span 
-                  className="password-toggle-icon" 
-                  onClick={toggleOldPasswordVisibility}
-                >
-                  {showOldPassword ? "Show" : "Hide"}
-                </span>
-              </div>
-            </div>
-            
-            <div className="robodog-popup-field">
-              <label>New Password</label>
-              <div className="password-input-container">
-                <input 
-                  type={showNewPassword ? "text" : "password"}
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="Enter new password"
-                />
-                <span 
-                  className="password-toggle-icon" 
-                  onClick={toggleNewPasswordVisibility}
-                >
-                  {showNewPassword ? "Show" : "Hide"}
-                </span>
-              </div>
-            </div>
-            
-            <div className="robodog-popup-field">
-              <label>Confirm New Password</label>
-              <div className="password-input-container">
-                <input 
-                  type={showConfirmPassword ? "text" : "password"}
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="Confirm new password"
-                />
-                <span 
-                  className="password-toggle-icon" 
-                  onClick={toggleConfirmPasswordVisibility}
-                >
-                  {showConfirmPassword ? "Show" : "Hide"}
-                </span>
-              </div>
-            </div>
-            
-            <div className="robodog-popup-buttons">
-              <button 
-                className="robodog-popup-cancel" 
-                onClick={onClose}
-                disabled={isLoading}
-              >
-                Cancel
-              </button>
-              <button 
-                className="robodog-popup-confirm" 
-                onClick={handleSubmit}
-                disabled={isLoading}
-              >
-                {isLoading ? 'Processing...' : 'Confirm'}
-              </button>
-            </div>
-          </>
-        )}
+          <h2 className="robodog-settings-subtitle-acc">Change Password</h2>
+        </div>
       </div>
+ 
+
+      <div className="pwd-form-container">
+        <form onSubmit={handleSubmit} className="pwd-form">
+          <p className="pwd-instruction-text">
+            Enter your email address below and we will send you a
+            link to reset your password.
+          </p>
+          
+          <div className="pwd-form-group">
+            <label className="pwd-label" htmlFor="email">
+              Email
+            </label>
+            <input
+              className="pwd-input"
+              type="email"
+              id="email"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+
+          {error && (
+            <div className="pwd-error-message">{error}</div>
+          )}
+          {message && (
+            <div className="pwd-success-message">{message}</div>
+          )}
+
+          <button
+            type="submit"
+            className="pwd-submit-button"
+            disabled={loading}
+          >
+            {loading ? 'Sending...' : 'Send Reset Link'}
+          </button>
+        </form>
+      </div>
+      <NavBar currentPage="settings" />
+
     </div>
   );
 };

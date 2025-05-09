@@ -21,6 +21,7 @@ const InfoDogPage = () => {
     systemStatus: 'Loading...',
     batteryPercentage: 'Loading...',
     gpsLocation: 'Loading...',
+    rawGpsData: null,
   });
 
   const [showNamePopup, setShowNamePopup] = useState(false);
@@ -41,14 +42,17 @@ const InfoDogPage = () => {
       const data = await response.json();
       
       let gpsLocation = "Not available";
+      let rawGpsData = null;
+      
       if (data.latitude !== undefined && data.longitude !== undefined ) {
-        gpsLocation = {
+        rawGpsData = {
           latitude: data.latitude,
           longitude: data.longitude,
           altitude: data.altitude || 0
         };
-        // JSON formatında gösterme (isteğe bağlı)
-        gpsLocation = JSON.stringify(gpsLocation);
+        
+        // Display format for UI
+        gpsLocation = `${data.latitude},${data.longitude}`;
       }
 
       setRobotData({   //Burada bağlandıktan sorna hangi değerler göüksün o yazıyor eğer değere ulaşılamazsa not available yazacak
@@ -56,6 +60,7 @@ const InfoDogPage = () => {
         systemStatus: "Connected" ,
         batteryPercentage: data.batteryPercentage || 'Not available',
         gpsLocation: gpsLocation,
+        rawGpsData: rawGpsData,
 
       });
     } catch (error) {
@@ -191,9 +196,9 @@ const InfoDogPage = () => {
   
   const openGoogleMaps = () => {
 
-    if (robotData.gpsLocation && robotData.gpsLocation !== 'Loading...' && robotData.gpsLocation !== 'Not available') {  //burada konumu Googlemaps linki yapar
-
-      window.open(`https://www.google.com/maps?q=${robotData.gpsLocation}`, '_blank');
+    if (robotData.rawGpsData) {  //burada konumu Googlemaps linki yapar
+      const { latitude, longitude } = robotData.rawGpsData;
+      window.open(`https://www.google.com/maps?q=${latitude},${longitude}`, '_blank');
     }
   };
   

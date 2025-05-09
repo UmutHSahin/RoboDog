@@ -14,6 +14,8 @@ import InfoDogPage from './components/HomePage/InfoDogPage';
 import ControlPage from './components/ControlPage/RoboDogController';
 import SettingsPage from './components/SettingsPage/SettingsMain'
 import RobotData from './components/SettingsPage/DataDisplay'
+import ChangePasswordPopup from './components/SettingsPage/ChangePasswordPopup'
+
 //import ResetPassword from './components/LoginSignupPage/ResetPassword';
 
 
@@ -79,6 +81,11 @@ function App() {
             <Route 
               path="/robotData" 
               element={<RobotData />} 
+            />
+
+            <Route 
+              path="/changePassword" 
+              element={<ChangePasswordPopup onBack={() => window.history.back()} />} 
             />
 
   
