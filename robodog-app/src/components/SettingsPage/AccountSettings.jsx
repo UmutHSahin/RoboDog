@@ -1,20 +1,21 @@
 // AccountSettings.jsx
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import './AccountSettings.css';
 import ChangePasswordPopup from './ChangePasswordPopup';
 import NavBar from '../NavBar/navbar';
 
-const AccountSettings = ({ onBack, onNavigate }) => {
+const AccountSettings = ({ onBack }) => {
+  const navigate = useNavigate();
+
   // Removed showPasswordPopup state since we'll navigate instead
 
   const handleChangePassword = () => {
-    // Instead of showing popup, navigate to change password page
-    if (onNavigate) {
-      onNavigate('/changePassword');
-    } else {
-      // Fallback if navigation prop isn't provided
-      window.location.href = '/changePassword';
-    }
+
+    navigate('/changePassword');
+
+
   };
 
   const handleLogout = () => {
