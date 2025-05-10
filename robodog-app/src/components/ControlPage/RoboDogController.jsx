@@ -3,6 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { FaHome, FaCog } from 'react-icons/fa';
 import { RiArrowLeftSLine, RiArrowRightSLine, RiArrowUpSLine, RiArrowDownSLine } from 'react-icons/ri';
 import { BsLightningFill, BsMic, BsExclamationTriangle, BsPower, BsCameraVideo, BsCameraVideoOff } from 'react-icons/bs';
+import { FaDog, FaPaw } from 'react-icons/fa';
+import { GiSittingDog, GiDogHouse } from 'react-icons/gi';
+import { GiDogBowl } from 'react-icons/gi';
+
+
 import './RoboDogController.css';
 import NavBar from '../../components/NavBar/navbar'; 
 
@@ -49,33 +54,74 @@ const RoboDogController = () => {
         const transcript = event.results[event.results.length - 1][0].transcript.toLowerCase();
         setListeningText(`Heard: ${transcript}`);
         
-       
-        if (transcript.includes('forward') || transcript.includes('go forward') || transcript.includes('move forward')) {
-          handleForward();
-        } else if (transcript.includes('back') || transcript.includes('backward') || transcript.includes('go back')) {
-          handleBack();
-        } else if (transcript.includes('left') || transcript.includes('go left') || transcript.includes('move left')) {
-          handleLeft();
-        } else if (transcript.includes('right') || transcript.includes('go right') || transcript.includes('move right')) {
-          handleRight();
-        } else if (transcript.includes('light') || transcript.includes('toggle light')) {
-          handleLightToggle();
-        } else if (transcript.includes('warning') || transcript.includes('alarm')) {
-          handleWarningToggle();
-        } else if (transcript.includes('fast') || transcript.includes('speed fast')) {
-          handleSpeedClick('fast');
-        } else if (transcript.includes('medium') || transcript.includes('normal speed')) {
-          handleSpeedClick('medium');
-        } else if (transcript.includes('slow') || transcript.includes('speed slow')) {
-          handleSpeedClick('slow');
+        // Function to simulate button click
+        const simulateButtonClick = (selector) => {
+          const button = document.querySelector(selector);
+          if (button && !button.disabled) {
+            button.click();
+          }
+        };
+        
+        // Match with console.log messages exactly
+        if (transcript.includes('moving forward')) {
+          simulateButtonClick('.direction-btn.up-btn');
+        } else if (transcript.includes('moving backward')) {
+          simulateButtonClick('.direction-btn.down-btn');
+        } else if (transcript.includes('moving left')) {
+          simulateButtonClick('.direction-btn.left-btn');
+        } else if (transcript.includes('moving right')) {
+          simulateButtonClick('.direction-btn.right-btn');
+        } else if (transcript.includes('light toggled')) {
+          simulateButtonClick('.action-btn.lightning-btn');
+        } else if (transcript.includes('warning triggered')) {
+          simulateButtonClick('.warning-btn');
+        } else if (transcript.includes('speed set to fast')) {
+          simulateButtonClick('.speed-btn:nth-child(1)');
+        } else if (transcript.includes('speed set to medium')) {
+          simulateButtonClick('.speed-btn:nth-child(2)');
+        } else if (transcript.includes('speed set to slow')) {
+          simulateButtonClick('.speed-btn:nth-child(3)');
+        } else if (transcript.includes('power on') || transcript.includes('power off')) {
+          simulateButtonClick('.power-btn');
+        } else if (transcript.includes('sending sit command')) {
+          simulateButtonClick('.warning-butttons .warning-btn:nth-child(1)');
+        } else if (transcript.includes('sending stand command')) {
+          simulateButtonClick('.warning-butttons .warning-btn:nth-child(2)');
+        } else if (transcript.includes('sending bend command')) {
+          simulateButtonClick('.warning-butttons .warning-btn:nth-child(3)');
         } else if (transcript.includes('camera off') || transcript.includes('turn off camera')) {
-          if (cameraEnabled) handleCameraToggle();
+          if (cameraEnabled) simulateButtonClick('.camera-btn');
         } else if (transcript.includes('camera on') || transcript.includes('turn on camera')) {
-          if (!cameraEnabled) handleCameraToggle();
+          if (!cameraEnabled) simulateButtonClick('.camera-btn');
         } else if (transcript.includes('stop listening') || transcript.includes('turn off microphone')) {
-          handleMicToggle(); 
+          simulateButtonClick('.action-btn.mic-btn');
         }
-
+        // Easier-to-say alternatives
+        else if (transcript.includes('forward')) {
+          simulateButtonClick('.direction-btn.up-btn');
+        } else if (transcript.includes('backward') || transcript.includes('back')) {
+          simulateButtonClick('.direction-btn.down-btn');
+        } else if (transcript.includes('left')) {
+          simulateButtonClick('.direction-btn.left-btn');
+        } else if (transcript.includes('right')) {
+          simulateButtonClick('.direction-btn.right-btn');
+        } else if (transcript.includes('light')) {
+          simulateButtonClick('.action-btn.lightning-btn');
+        } else if (transcript.includes('warning') || transcript.includes('alarm')) {
+          simulateButtonClick('.warning-btn');
+        } else if (transcript.includes('fast')) {
+          simulateButtonClick('.speed-btn:nth-child(1)');
+        } else if (transcript.includes('medium')) {
+          simulateButtonClick('.speed-btn:nth-child(2)');
+        } else if (transcript.includes('slow')) {
+          simulateButtonClick('.speed-btn:nth-child(3)');
+        } else if (transcript.includes('sit')) {
+          simulateButtonClick('.warning-butttons .warning-btn:nth-child(1)');
+        } else if (transcript.includes('stand')) {
+          simulateButtonClick('.warning-butttons .warning-btn:nth-child(2)');
+        } else if (transcript.includes('bend')) {
+          simulateButtonClick('.warning-butttons .warning-btn:nth-child(3)');
+        }
         
         setTimeout(() => {
           setListeningText("");
@@ -86,13 +132,17 @@ const RoboDogController = () => {
 
         console.error('Speech recognition error', event.error);
 
-        if (event.error === 'no-speech') {
+        if (event.error === 'no-speech' || event.error === 'aborted') {
           
           if (micActive && recognitionRef.current) {
 
             try {
-
-              recognitionRef.current.start();
+              // Short delay before restarting to avoid immediate restart issues
+              setTimeout(() => {
+                if (micActive) {
+                  recognitionRef.current.start();
+                }
+              }, 300);
 
             } catch (e) {
 
@@ -114,9 +164,25 @@ const RoboDogController = () => {
         
         if (micActive && recognitionRef.current) {
           try {
-            recognitionRef.current.start();
+            // Small delay before restarting
+            setTimeout(() => {
+              if (micActive) {
+                recognitionRef.current.start();
+              }
+            }, 300);
           } catch (e) {
             console.log('Recognition already started');
+            
+            // Try again after a longer delay if there was an error
+            setTimeout(() => {
+              if (micActive && recognitionRef.current) {
+                try {
+                  recognitionRef.current.start();
+                } catch (err) {
+                  console.log('Still could not restart recognition');
+                }
+              }
+            }, 1000);
           }
         }
       };
@@ -409,6 +475,58 @@ const RoboDogController = () => {
       });
   };
 
+
+  const handleSit = () => {
+    if (!powerOn || !espIP) return;
+    console.log("Sending sit command");
+  
+    fetch(`http://${espIP}/message?text=sit`)
+      .then(response => {
+        if (response.ok) {
+          console.log("Sit command sent successfully");
+        } else {
+          console.error("Failed to send sit command");
+        }
+      })
+      .catch(error => {
+        console.error("Error sending sit command:", error);
+      });
+  };
+  
+  const handleStand = () => {
+    if (!powerOn || !espIP) return;
+    console.log("Sending stand command");
+  
+    fetch(`http://${espIP}/message?text=stand`)
+      .then(response => {
+        if (response.ok) {
+          console.log("Stand command sent successfully");
+        } else {
+          console.error("Failed to send stand command");
+        }
+      })
+      .catch(error => {
+        console.error("Error sending stand command:", error);
+      });
+  };
+  
+  const handleBend = () => {
+    if (!powerOn || !espIP) return;
+    console.log("Sending bend command");
+  
+    fetch(`http://${espIP}/message?text=bend`)
+      .then(response => {
+        if (response.ok) {
+          console.log("Bend command sent successfully");
+        } else {
+          console.error("Failed to send bend command");
+        }
+      })
+      .catch(error => {
+        console.error("Error sending bend command:", error);
+      });
+  };
+
   const handleMicToggle = () => {
     if (!powerOn || !espIP) return;
     
@@ -421,7 +539,19 @@ const RoboDogController = () => {
       setListeningText("Listening for commands...");
       if (recognitionRef.current) {
         try {
-          recognitionRef.current.start();
+          // Stop any existing recognition first
+          try {
+            recognitionRef.current.abort();
+          } catch (e) {
+            // Ignore abort errors
+          }
+          
+          // Small delay before starting
+          setTimeout(() => {
+            if (recognitionRef.current) {
+              recognitionRef.current.start();
+            }
+          }, 200);
         } catch (e) {
           console.error("Error starting speech recognition:", e);
         }
@@ -581,13 +711,29 @@ const RoboDogController = () => {
               >
                 Slow
               </button>
-              <button 
-                className="camera-btn"
-                onClick={handleCameraToggle} 
-                disabled={!powerOn}
-              >
-                {cameraEnabled ? <BsCameraVideo /> : <BsCameraVideoOff />}
-              </button>
+                <div className='warning-butttons'>
+                    <button 
+                        className="warning-btn"
+                        onClick={handleSit} 
+                        disabled={!powerOn}
+                      >
+                      <FaDog />
+                    </button>           
+                    <button 
+                        className="warning-btn"
+                        onClick={handleStand} 
+                        disabled={!powerOn}
+                      >
+                        <GiSittingDog />
+                      </button>
+                      <button 
+                        className="warning-btn"
+                        onClick={handleBend} 
+                        disabled={!powerOn}
+                      >
+                        <GiDogBowl />
+                      </button>
+                </div>
             </div>
           </div>
 
@@ -598,6 +744,13 @@ const RoboDogController = () => {
             >
               <BsPower />
             </button>
+            <button 
+                className="camera-btn"
+                onClick={handleCameraToggle} 
+                disabled={!powerOn}
+              >
+                {cameraEnabled ? <BsCameraVideo /> : <BsCameraVideoOff />}
+              </button>
           </div>
         </div>
       </main>
