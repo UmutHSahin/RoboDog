@@ -202,18 +202,15 @@ const RoboDogController = () => {
 
 
 
-  // Replace the existing WebSocket camera connection code with this improved version
 useEffect(() => {
   const connectWebSockets = () => {
     if (!espIP || !cameraEnabled) return;
     
-    // Close any existing connection
     if (wsCamera.current) {
       wsCamera.current.close();
       wsCamera.current = null;
     }
     
-    // Create new WebSocket connection
     wsCamera.current = new WebSocket(`ws://${espIP}/Camera`);
     wsCamera.current.binaryType = 'blob';
     
@@ -226,7 +223,6 @@ useEffect(() => {
       console.log("Camera WebSocket disconnected", event.code, event.reason);
       setCameraConnected(false);
       
-      // Only attempt to reconnect if power is on and camera is enabled
       if (powerOn && cameraEnabled) {
         console.log("Will attempt to reconnect camera in 2 seconds");
         setTimeout(connectWebSockets, 2000);
@@ -241,12 +237,12 @@ useEffect(() => {
     let previousImageUrl = null;
     wsCamera.current.onmessage = (event) => {
       if (cameraImageRef.current && event.data instanceof Blob) {
-        // Clean up previous object URL to prevent memory leaks
+
         if (previousImageUrl) {
           URL.revokeObjectURL(previousImageUrl);
         }
         
-        // Create new object URL and store reference for cleanup
+
         previousImageUrl = URL.createObjectURL(event.data);
         cameraImageRef.current.src = previousImageUrl;
         setCameraConnected(true);
@@ -265,7 +261,7 @@ useEffect(() => {
       wsCamera.current = null;
     }
   };
-}, [powerOn, espIP, cameraEnabled]); // Dependencies that should trigger reconnection
+}, [powerOn, espIP, cameraEnabled]); 
 
   const handleDisconnect = () => {
 
