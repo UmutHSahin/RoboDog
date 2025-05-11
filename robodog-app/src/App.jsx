@@ -12,9 +12,9 @@ import SplashScreen from './components/StartAppPage/SplashScreen';
 import ConnectDogPage from './components/HomePage/ConnectDogPage';
 import InfoDogPage from './components/HomePage/InfoDogPage';
 import ControlPage from './components/ControlPage/RoboDogController';
-import SettingsPage from './components/SettingsPage/SettingsMain'
-import RobotData from './components/SettingsPage/DataDisplay'
-import ChangePasswordPopup from './components/SettingsPage/ChangePasswordPopup'
+import SettingsPage from './components/SettingsPage/SettingsMain';
+import RobotData from './components/SettingsPage/DataDisplay';
+import ChangePasswordPopup from './components/SettingsPage/ChangePasswordPopup';
 
 //import ResetPassword from './components/LoginSignupPage/ResetPassword';
 
@@ -24,9 +24,20 @@ import './App.css';
 // Set axios base URL for all requests
 axios.defaults.baseURL = 'https://localhost:44374';
 
+const ProtectedRoute = ({ element, isLoggedIn }) => {
+  return isLoggedIn ? element : <Navigate to="/login" replace />;
+};
+
 function App() {
   const [loading, setLoading] = useState(true);  //Açılış ekranının gösterip gösterilmeyeceğini belirler, ture ise görünür.
   const [isLoggedIn, setIsLoggedIn] = useState(false); // kullanıcı giriş yaptı mı yapmadı mı ona bakıyor
+
+  useEffect(() => {
+    const userToken = localStorage.getItem('userToken');
+    if (userToken) {
+      setIsLoggedIn(true);
+    }
+  }, []);
 
   //Bu bölüm açılış ekranını 3 saniye sonra false yaparak görünmez kılmaya sağlıyor
   useEffect(() => {
@@ -56,39 +67,39 @@ function App() {
             {/*Bu /connect olduğunda ConnectDogPage sayfasına gönderir*/}
             <Route                          
               path="/connect" 
-              element={<ConnectDogPage />} 
+              element={<ProtectedRoute isLoggedIn={isLoggedIn} element={<ConnectDogPage />} />} 
             />          
 
             {/*Bu /info olduğunda InfoDogPage sayfasına gönderir*/}                              
             <Route 
               path="/info" 
-              element={<InfoDogPage />} 
+              element={<ProtectedRoute isLoggedIn={isLoggedIn} element={<InfoDogPage />} />} 
             />
 
             {/*Bu /robotControl olduğunda ControlPage sayfasına gönderir*/}
             <Route 
               path="/robotControl" 
-              element={<ControlPage />} 
+              element={<ProtectedRoute isLoggedIn={isLoggedIn} element={<ControlPage />} />} 
             />
             
             {/*Bu /settings olduğunda SettingsPage sayfasına gönderir*/}
             <Route 
               path="/settings" 
-              element={<SettingsPage />} 
+              element={<ProtectedRoute isLoggedIn={isLoggedIn} element={<SettingsPage />} />} 
             />
               
             {/*Bu /robotData olduğunda RobotData sayfasına gönderir*/}
             <Route 
               path="/robotData" 
-              element={<RobotData />} 
+              element={<ProtectedRoute isLoggedIn={isLoggedIn} element={<RobotData />} />} 
             />
 
             <Route 
               path="/changePassword" 
-              element={<ChangePasswordPopup onBack={() => window.history.back()} />} 
+              element={<ProtectedRoute isLoggedIn={isLoggedIn} element={<ChangePasswordPopup onBack={() => window.history.back()} />} />} 
             />
 
-  
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>
       </div>

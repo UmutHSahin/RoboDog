@@ -111,16 +111,11 @@ const InfoDogPage = () => {
       return;
     }
     
-    // Initial fetch of data
     fetchRobotData();
-    
-    // Set up interval for fetching robot data
-    const interval = setInterval(fetchRobotData, 3000);
-    
-    return () => clearInterval(interval);
+       
   }, [navigate]);
   
-  // Handle name submission from popup
+  
   const handleNameSubmit = async (newName) => {
     const ipAddress = localStorage.getItem('espIP');
     

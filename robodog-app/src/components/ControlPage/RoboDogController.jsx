@@ -21,11 +21,17 @@ const RoboDogController = () => {
   const [showNoIPModal, setShowNoIPModal] = useState(false); //Ip girilmemişse gösterilecek olan şeyleri tutar
   const [micActive, setMicActive] = useState(false);   // mikdorofn açıkmı değilmi onu tutar
   const [listeningText, setListeningText] = useState(""); //mikrofon dinlerken dinlenilen textleri tutuar
+  const [lightLevel, setLightLevel] = useState(0);  // 0, 125, or 255
 
   const wsCamera = useRef(null); //Kamera WebSocket bağlantısını tutar
   const cameraImageRef = useRef(null);
   const recognitionRef = useRef(null);  //Konuşma tanıma (SpeechRecognition) nesnesini tutar
 
+
+
+
+
+  
   useEffect(() => {   //Sayfa yüklendiğinde Ip varmı oan bakar yoksa  setShowNoIPModal döndürür
 
     const storedIP = localStorage.getItem('espIP');
@@ -54,7 +60,6 @@ const RoboDogController = () => {
         const transcript = event.results[event.results.length - 1][0].transcript.toLowerCase();
         setListeningText(`Heard: ${transcript}`);
         
-        // Function to simulate button click
         const simulateButtonClick = (selector) => {
           const button = document.querySelector(selector);
           if (button && !button.disabled) {
@@ -62,18 +67,22 @@ const RoboDogController = () => {
           }
         };
         
-        // Match with console.log messages exactly
-        if (transcript.includes('moving forward')) {
+        if (transcript.includes('moving walk')) {
           simulateButtonClick('.direction-btn.up-btn');
-        } else if (transcript.includes('moving backward')) {
+        } else if (transcript.includes('moving stop')) {
           simulateButtonClick('.direction-btn.down-btn');
-        } else if (transcript.includes('moving left')) {
-          simulateButtonClick('.direction-btn.left-btn');
-        } else if (transcript.includes('moving right')) {
-          simulateButtonClick('.direction-btn.right-btn');
-        } else if (transcript.includes('light toggled')) {
+        } else if (transcript.includes('light off')) {
+          setLightLevel(0);
+          fetch(`http://${espIP}/message?text=flash:0`);
+        } else if (transcript.includes('light low') || transcript.includes('light dim')) {
+          setLightLevel(125);
+          fetch(`http://${espIP}/message?text=flash:125`);
+        } else if (transcript.includes('light high') || transcript.includes('light bright')) {
+          setLightLevel(255);
+          fetch(`http://${espIP}/message?text=flash:255`);
+        } else if (transcript.includes('light toggled') || transcript.includes('light')) {
           simulateButtonClick('.action-btn.lightning-btn');
-        } else if (transcript.includes('warning triggered')) {
+        } else if (transcript.includes('bark triggered')) {
           simulateButtonClick('.warning-btn');
         } else if (transcript.includes('speed set to fast')) {
           simulateButtonClick('.speed-btn:nth-child(1)');
@@ -96,18 +105,12 @@ const RoboDogController = () => {
         } else if (transcript.includes('stop listening') || transcript.includes('turn off microphone')) {
           simulateButtonClick('.action-btn.mic-btn');
         }
-        // Easier-to-say alternatives
-        else if (transcript.includes('forward')) {
+
+        else if (transcript.includes('walk')) {
           simulateButtonClick('.direction-btn.up-btn');
-        } else if (transcript.includes('backward') || transcript.includes('back')) {
+        } else if (transcript.includes('stop')) {
           simulateButtonClick('.direction-btn.down-btn');
-        } else if (transcript.includes('left')) {
-          simulateButtonClick('.direction-btn.left-btn');
-        } else if (transcript.includes('right')) {
-          simulateButtonClick('.direction-btn.right-btn');
-        } else if (transcript.includes('light')) {
-          simulateButtonClick('.action-btn.lightning-btn');
-        } else if (transcript.includes('warning') || transcript.includes('alarm')) {
+        } else if (transcript.includes('bark') || transcript.includes('alarm')) {
           simulateButtonClick('.warning-btn');
         } else if (transcript.includes('fast')) {
           simulateButtonClick('.speed-btn:nth-child(1)');
@@ -137,7 +140,7 @@ const RoboDogController = () => {
           if (micActive && recognitionRef.current) {
 
             try {
-              // Short delay before restarting to avoid immediate restart issues
+
               setTimeout(() => {
                 if (micActive) {
                   recognitionRef.current.start();
@@ -164,7 +167,7 @@ const RoboDogController = () => {
         
         if (micActive && recognitionRef.current) {
           try {
-            // Small delay before restarting
+
             setTimeout(() => {
               if (micActive) {
                 recognitionRef.current.start();
@@ -173,7 +176,7 @@ const RoboDogController = () => {
           } catch (e) {
             console.log('Recognition already started');
             
-            // Try again after a longer delay if there was an error
+
             setTimeout(() => {
               if (micActive && recognitionRef.current) {
                 try {
@@ -199,58 +202,70 @@ const RoboDogController = () => {
 
 
 
-  useEffect(() => {
-
-
-    const connectWebSockets = () => {
-
-      if (!espIP || !cameraEnabled) return; ///Kamera WebSocket bağlantısını kuruyor
-      
-      wsCamera.current = new WebSocket(`ws://${espIP}/Camera`);
-      wsCamera.current.binaryType = 'blob';
-      
-      wsCamera.current.onopen = () => {
-
-        console.log("Camera WebSocket connected");
-        setCameraConnected(true);
-
-      };
-
-      wsCamera.current.onclose = () => {
-
-        console.log("Camera WebSocket disconnected");
-        setCameraConnected(false);
-
-        if (cameraEnabled) {
-          setTimeout(connectWebSockets, 2000);
-        }
-      };
-      
-      wsCamera.current.onmessage = (event) => {
-
-        if (cameraImageRef.current && event.data instanceof Blob) {
-
-          //WebSocket'ten gelen kamera görüntüsünü <img> elemanına yerleştirir.
-
-          cameraImageRef.current.src = URL.createObjectURL(event.data);
-          setCameraConnected(true);
-
-        }
-      };
-    };
+  // Replace the existing WebSocket camera connection code with this improved version
+useEffect(() => {
+  const connectWebSockets = () => {
+    if (!espIP || !cameraEnabled) return;
     
-    if (powerOn && espIP && cameraEnabled) {
-
-      connectWebSockets();
-
+    // Close any existing connection
+    if (wsCamera.current) {
+      wsCamera.current.close();
+      wsCamera.current = null;
     }
     
-    return () => {
-
-      if (wsCamera.current) wsCamera.current.close();
-
+    // Create new WebSocket connection
+    wsCamera.current = new WebSocket(`ws://${espIP}/Camera`);
+    wsCamera.current.binaryType = 'blob';
+    
+    wsCamera.current.onopen = () => {
+      console.log("Camera WebSocket connected");
+      setCameraConnected(true);
     };
-  }, [powerOn, espIP, cameraEnabled]);
+
+    wsCamera.current.onclose = (event) => {
+      console.log("Camera WebSocket disconnected", event.code, event.reason);
+      setCameraConnected(false);
+      
+      // Only attempt to reconnect if power is on and camera is enabled
+      if (powerOn && cameraEnabled) {
+        console.log("Will attempt to reconnect camera in 2 seconds");
+        setTimeout(connectWebSockets, 2000);
+      }
+    };
+    
+    wsCamera.current.onerror = (error) => {
+      console.error("Camera WebSocket error:", error);
+      // Don't attempt to reconnect on error - the onclose handler will handle that
+    };
+    
+    let previousImageUrl = null;
+    wsCamera.current.onmessage = (event) => {
+      if (cameraImageRef.current && event.data instanceof Blob) {
+        // Clean up previous object URL to prevent memory leaks
+        if (previousImageUrl) {
+          URL.revokeObjectURL(previousImageUrl);
+        }
+        
+        // Create new object URL and store reference for cleanup
+        previousImageUrl = URL.createObjectURL(event.data);
+        cameraImageRef.current.src = previousImageUrl;
+        setCameraConnected(true);
+      }
+    };
+  };
+  
+  if (powerOn && espIP && cameraEnabled) {
+    connectWebSockets();
+  }
+  
+  return () => {
+    if (wsCamera.current) {
+      console.log("Cleaning up camera WebSocket connection");
+      wsCamera.current.close();
+      wsCamera.current = null;
+    }
+  };
+}, [powerOn, espIP, cameraEnabled]); // Dependencies that should trigger reconnection
 
   const handleDisconnect = () => {
 
@@ -381,6 +396,8 @@ const RoboDogController = () => {
     
     if (!newPowerState) {
 
+      setLightLevel(0);
+
       if (wsCamera.current) wsCamera.current.close();
       setCameraConnected(false);
       
@@ -399,18 +416,23 @@ const RoboDogController = () => {
 
   const handleLightToggle = () => {
     if (!powerOn || !espIP) return;
-    console.log("Light toggled");
     
-    fetch(`http://${espIP}/message?text=light:toggle`)
+    // değer değişimi 0 -> 125 -> 255 -> 0
+    const nextLightLevel = lightLevel === 0 ? 125 : lightLevel === 125 ? 255 : 0;
+    setLightLevel(nextLightLevel);
+    
+    console.log(`Light level set to ${nextLightLevel}`);
+    
+    fetch(`http://${espIP}/message?text=flash:${nextLightLevel}`)
       .then(response => {
         if (response.ok) {
-          console.log("Light toggle command sent successfully");
+          console.log(`Light level ${nextLightLevel} command sent successfully`);
         } else {
-          console.error("Failed to send light toggle command");
+          console.error("Failed to send light level command");
         }
       })
       .catch(error => {
-        console.error("Error sending light toggle command:", error);
+        console.error("Error sending light level command:", error);
       });
   };
 
@@ -434,26 +456,9 @@ const RoboDogController = () => {
 
   const handleSit = () => {
     if (!powerOn || !espIP) return;
-    console.log("Sending sit command");
-  
-    fetch(`http://${espIP}/message?text=stand`)
-      .then(response => {
-        if (response.ok) {
-          console.log("Sit command sent successfully");
-        } else {
-          console.error("Failed to send sit command");
-        }
-      })
-      .catch(error => {
-        console.error("Error sending sit command:", error);
-      });
-  };
-  
-  const handleStand = () => {
-    if (!powerOn || !espIP) return;
     console.log("Sending stand command");
   
-    fetch(`http://${espIP}/message?text=sit`)
+    fetch(`http://${espIP}/message?text=stand`)
       .then(response => {
         if (response.ok) {
           console.log("Stand command sent successfully");
@@ -463,6 +468,23 @@ const RoboDogController = () => {
       })
       .catch(error => {
         console.error("Error sending stand command:", error);
+      });
+  };
+  
+  const handleStand = () => {
+    if (!powerOn || !espIP) return;
+    console.log("Sending sit command");
+  
+    fetch(`http://${espIP}/message?text=sit`)
+      .then(response => {
+        if (response.ok) {
+          console.log("Sit command sent successfully");
+        } else {
+          console.error("Failed to send sit command");
+        }
+      })
+      .catch(error => {
+        console.error("Error sending sit command:", error);
       });
   };
   
@@ -495,14 +517,14 @@ const RoboDogController = () => {
       setListeningText("Listening for commands...");
       if (recognitionRef.current) {
         try {
-          // Stop any existing recognition first
+
           try {
             recognitionRef.current.abort();
           } catch (e) {
-            // Ignore abort errors
+
           }
           
-          // Small delay before starting
+
           setTimeout(() => {
             if (recognitionRef.current) {
               recognitionRef.current.start();
@@ -605,9 +627,10 @@ const RoboDogController = () => {
 
           <div className="middle-controls">
             <button 
-              className="action-btn lightning-btn"
+              className={`action-btn lightning-btn ${lightLevel > 0 ? 'active' : ''}`}
               onClick={handleLightToggle} 
               disabled={!powerOn}
+              style={{ opacity: lightLevel === 0 ? 0.6 : lightLevel === 125 ? 0.8 : 1 }}
             >
               <BsLightningFill />
             </button>
