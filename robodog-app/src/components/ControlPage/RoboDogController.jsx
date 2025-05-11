@@ -115,9 +115,9 @@ const RoboDogController = () => {
           simulateButtonClick('.speed-btn:nth-child(2)');
         } else if (transcript.includes('slow')) {
           simulateButtonClick('.speed-btn:nth-child(3)');
-        } else if (transcript.includes('sit')) {
-          simulateButtonClick('.warning-butttons .warning-btn:nth-child(1)');
         } else if (transcript.includes('stand')) {
+          simulateButtonClick('.warning-butttons .warning-btn:nth-child(1)');
+        } else if (transcript.includes('sit')) {
           simulateButtonClick('.warning-butttons .warning-btn:nth-child(2)');
         } else if (transcript.includes('bend')) {
           simulateButtonClick('.warning-butttons .warning-btn:nth-child(3)');
@@ -303,9 +303,9 @@ const RoboDogController = () => {
 
     if (!powerOn || !espIP) return;
 
-    console.log("Moving forward");
+    console.log("walk");
     
-    fetch(`http://${espIP}/forward`)
+    fetch(`http://${espIP}/message?text=walk`)
 
       .then(response => {
 
@@ -327,9 +327,9 @@ const RoboDogController = () => {
   const handleBack = () => {
 
     if (!powerOn || !espIP) return;
-    console.log("Moving backward");
+    console.log("stop");
     
-    fetch(`http://${espIP}/back`)
+    fetch(`http://${espIP}/message?text=stop`)
       .then(response => {
 
         if (response.ok) {
@@ -346,61 +346,17 @@ const RoboDogController = () => {
       });
   };
   
-  const handleLeft = () => {
 
-    if (!powerOn || !espIP) return;
-    console.log("Moving left");
-    
-    fetch(`http://${espIP}/left`)
-
-      .then(response => {
-
-        if (response.ok) {
-
-          console.log("Left command sent successfully");
-        } else {
-
-          console.error("Failed to send left command");
-        }
-      })
-      .catch(error => {
-
-        console.error("Error sending left command:", error);
-      });
-  };
-  
-  const handleRight = () => {
-
-    if (!powerOn || !espIP) return;
-    console.log("Moving right");
-    
-    fetch(`http://${espIP}/right`)
-
-      .then(response => {
-
-        if (response.ok) {
-
-          console.log("Right command sent successfully");
-        } else {
-
-          console.error("Failed to send right command");
-        }
-      })
-      .catch(error => {
-
-        console.error("Error sending right command:", error);
-      });
-  };
 
   const handleSpeedClick = (speed) => {
 
     if (!powerOn || !espIP) return;
     setSelectedSpeed(speed);
-    console.log(`Speed set to ${speed}`);
+    console.log(`Delay set to ${speed}`);
     
-    const speedValue = speed === 'slow' ? 50 : speed === 'medium' ? 150 : 255;
+    const speedValue = speed === 'slow' ? 1000 : speed === 'medium' ? 500 : 250;
     
-    fetch(`http://${espIP}/message?text=speed:${speedValue}`)
+    fetch(`http://${espIP}/message?text=delay:${speedValue}`)
 
       .then(response => {
 
@@ -460,18 +416,18 @@ const RoboDogController = () => {
 
   const handleWarningToggle = () => {
     if (!powerOn || !espIP) return;
-    console.log("Warning triggered");
+    console.log("bark");
     
-    fetch(`http://${espIP}/message?text=warning:trigger`)
+    fetch(`http://${espIP}/message?text=bark`)
       .then(response => {
         if (response.ok) {
-          console.log("Warning trigger command sent successfully");
+          console.log("bark command sent successfully");
         } else {
-          console.error("Failed to send warning trigger command");
+          console.error("Failed to send bark command");
         }
       })
       .catch(error => {
-        console.error("Error sending warning trigger command:", error);
+        console.error("Error sending bark command:", error);
       });
   };
 
@@ -480,7 +436,7 @@ const RoboDogController = () => {
     if (!powerOn || !espIP) return;
     console.log("Sending sit command");
   
-    fetch(`http://${espIP}/message?text=sit`)
+    fetch(`http://${espIP}/message?text=stand`)
       .then(response => {
         if (response.ok) {
           console.log("Sit command sent successfully");
@@ -497,7 +453,7 @@ const RoboDogController = () => {
     if (!powerOn || !espIP) return;
     console.log("Sending stand command");
   
-    fetch(`http://${espIP}/message?text=stand`)
+    fetch(`http://${espIP}/message?text=sit`)
       .then(response => {
         if (response.ok) {
           console.log("Stand command sent successfully");
@@ -637,24 +593,7 @@ const RoboDogController = () => {
             >
               <RiArrowUpSLine />
             </button>
-            <div className="horizontal-controls">
-              <button 
-                onClick={handleLeft} 
-                disabled={!powerOn}
-                className="direction-btn left-btn"
-                style={{ marginRight: "20px"}}
-              >
-                <RiArrowLeftSLine />
-              </button>
-              <button 
-                onClick={handleRight} 
-                disabled={!powerOn}
-                className="direction-btn right-btn"
-                style={{ marginLeft: "20px"}}
-              >
-                <RiArrowRightSLine />
-              </button>
-            </div>
+
             <button 
               onClick={handleBack} 
               disabled={!powerOn}
