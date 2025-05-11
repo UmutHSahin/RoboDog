@@ -115,7 +115,7 @@ const InfoDogPage = () => {
        
   }, [navigate]);
   
-  
+
   const handleNameSubmit = async (newName) => {
     const ipAddress = localStorage.getItem('espIP');
     
@@ -174,18 +174,24 @@ const InfoDogPage = () => {
     }
   };
   
-  const openGoogleMaps = () => {
-    if (robotData.gpsLocation && robotData.gpsLocation !== 'Loading...' && robotData.gpsLocation !== 'Not available') {
-      try {
-        const locationObj = JSON.parse(robotData.gpsLocation);
-        if (locationObj.latitude && locationObj.longitude) {
-          window.open(`https://www.google.com/maps?q=${locationObj.latitude},${locationObj.longitude}`, '_blank');
-        }
-      } catch (e) {
-        console.error('Error parsing location data', e);
+const openGoogleMaps = () => {
+  if (robotData.gpsLocation && robotData.gpsLocation !== 'Loading...' && robotData.gpsLocation !== 'Not available') {
+    try {
+      const locationObj = JSON.parse(robotData.gpsLocation);
+      if (locationObj.latitude && locationObj.longitude) {
+        const url = `https://www.google.com/maps?q=${locationObj.latitude},${locationObj.longitude}`;
+        window.open(url, '_blank', 'noopener,noreferrer'); // Added security attributes
+      } else {
+        alert('Invalid GPS coordinates. Please try again later.');
       }
+    } catch (e) {
+      console.error('Error parsing location data:', e);
+      alert('Unable to open Google Maps. Location data is invalid.');
     }
-  };
+  } else {
+    alert('GPS location is not available.');
+  }
+};
   
   if (error) {
     return (

@@ -6,9 +6,12 @@ import { BsLightningFill, BsMic, BsExclamationTriangle, BsPower, BsCameraVideo, 
 import { FaDog, FaPaw } from 'react-icons/fa';
 import { GiSittingDog, GiDogHouse } from 'react-icons/gi';
 import { GiDogBowl } from 'react-icons/gi';
+import { GiHand } from 'react-icons/gi';
+
 
 
 import './RoboDogController.css';
+import ExecLauncherButton from '../ControlPage/ExecLauncherButton ';
 import NavBar from '../../components/NavBar/navbar'; 
 
 const RoboDogController = () => {
@@ -561,6 +564,30 @@ useEffect(() => {
     navigate('/connect');
   };
 
+  const handleExecute = async () => {
+    if (!powerOn || !espIP) return Promise.reject(new Error('Power is off or no IP address'));
+    
+    console.log('Sending execute command to:', espIP);
+    
+    try {
+      // Send command to the robot via HTTP
+      const response = await fetch(`http://${espIP}/message?text=execute`, {
+        method: 'GET',
+        // Add a timeout to prevent hanging if the robot doesn't respond
+        signal: AbortSignal.timeout(5000)
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Command failed with status: ${response.status}`);
+      }
+      
+      console.log('Execute command sent successfully');
+      return Promise.resolve();
+    } catch (error) {
+      console.error('Error sending execute command:', error);
+      return Promise.reject(error);
+    }
+  };
   return (
     <div className="robodog-app">
       <div className="contorol-page-header">
@@ -709,6 +736,11 @@ useEffect(() => {
               >
                 {cameraEnabled ? <BsCameraVideo /> : <BsCameraVideoOff />}
               </button>
+
+              <ExecLauncherButton 
+                disabled={!powerOn}
+                onClick={handleExecute}
+                          />
           </div>
         </div>
       </main>
