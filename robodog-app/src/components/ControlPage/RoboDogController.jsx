@@ -422,7 +422,7 @@ useEffect(() => {
     
     console.log(`Light level set to ${nextLightLevel}`);
     
-    fetch(`http://${espIP}/message?text=flash:${nextLightLevel}`)
+    fetch(`http://${espIP}/message?text=led:${nextLightLevel}`)
       .then(response => {
         if (response.ok) {
           console.log(`Light level ${nextLightLevel} command sent successfully`);
@@ -565,29 +565,37 @@ useEffect(() => {
   };
 
   const handleExecute = async () => {
-    if (!powerOn || !espIP) return Promise.reject(new Error('Power is off or no IP address'));
-    
-    console.log('Sending execute command to:', espIP);
-    
+    if (!powerOn) {
+      return Promise.reject(new Error('Power is off or backend IP address is missing'));
+    }
+  
+    console.log('Sending execute command to backend at:');
+  
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 saniye timeout
+  
     try {
-      // Send command to the robot via HTTP
-      const response = await fetch(`http://${espIP}/message?text=execute`, {
+      const response = await fetch(`https://localhost:44374/api/execute/cmd`, {
         method: 'GET',
-        // Add a timeout to prevent hanging if the robot doesn't respond
-        signal: AbortSignal.timeout(5000)
+        signal: controller.signal
       });
-      
+  
+      clearTimeout(timeoutId);
+  
       if (!response.ok) {
         throw new Error(`Command failed with status: ${response.status}`);
       }
-      
-      console.log('Execute command sent successfully');
-      return Promise.resolve();
+  
+      const result = await response.json();
+      console.log('Execute command response:', result);
+  
+      return Promise.resolve(result);
     } catch (error) {
       console.error('Error sending execute command:', error);
       return Promise.reject(error);
     }
   };
+  
   return (
     <div className="robodog-app">
       <div className="contorol-page-header">
