@@ -569,15 +569,16 @@ useEffect(() => {
       return Promise.reject(new Error('Power is off or backend IP address is missing'));
     }
   
-    console.log('Sending execute command to backend at:');
+    const targetIP = '192.168.1.1'; // ← Buraya uygun IP'yi yaz
+    console.log('Sending execute command to backend at:', targetIP);
   
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 saniye timeout
   
     try {
-      const response = await fetch(`https://localhost:44374/api/execute/cmd`, {
+      const response = await fetch(`https://localhost:44374/api/execute/cmd?ip=${encodeURIComponent(targetIP)}`, {
         method: 'GET',
-        signal: controller.signal
+        signal: controller.signal,
       });
   
       clearTimeout(timeoutId);
@@ -595,6 +596,9 @@ useEffect(() => {
       return Promise.reject(error);
     }
   };
+  
+
+  
   
   return (
     <div className="robodog-app">
@@ -748,7 +752,7 @@ useEffect(() => {
               <ExecLauncherButton 
                 disabled={!powerOn}
                 onClick={handleExecute}
-                          />
+              />
           </div>
         </div>
       </main>
