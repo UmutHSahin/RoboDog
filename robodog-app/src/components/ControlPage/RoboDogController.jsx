@@ -8,6 +8,7 @@ import { GiSittingDog, GiDogHouse } from 'react-icons/gi';
 import { GiDogBowl } from 'react-icons/gi';
 import { GiHand } from 'react-icons/gi';
 import { GiRobotGolem } from 'react-icons/gi';
+import { FaMicrophoneAlt  } from 'react-icons/fa';
 
 
 
@@ -108,6 +109,10 @@ const RoboDogController = () => {
           if (!cameraEnabled) simulateButtonClick('.camera-btn');
         } else if (transcript.includes('stop listening') || transcript.includes('turn off microphone')) {
           simulateButtonClick('.action-btn.mic-btn');
+        }else if (transcript.includes('start sing') || transcript.includes('turn off microphone')) {
+          simulateButtonClick('.sing-warning-btn');
+        }else if (transcript.includes('walk auto') || transcript.includes('turn off microphone')) {
+          simulateButtonClick('.direction-btn .auto-btn');
         }
 
         else if (transcript.includes('walk')) {
@@ -128,7 +133,12 @@ const RoboDogController = () => {
           simulateButtonClick('.warning-butttons .warning-btn:nth-child(2)');
         } else if (transcript.includes('bend')) {
           simulateButtonClick('.warning-butttons .warning-btn:nth-child(3)');
+        }else if (transcript.includes('sing')) {
+          simulateButtonClick('.sing-warning-btn');
+        }else if (transcript.includes('auto')) {
+          simulateButtonClick('.direction-btn .auto-btn');
         }
+        
         
         setTimeout(() => {
           setListeningText("");
@@ -570,6 +580,25 @@ useEffect(() => {
       });
   };
 
+
+    
+  const handleSing = () => {
+    if (!powerOn || !espIP) return;
+    console.log("Sending sing command");
+  
+    fetch(`http://${espIP}/message?text=sing`)
+      .then(response => {
+        if (response.ok) {
+          console.log("Bend command sent successfully");
+        } else {
+          console.error("Failed to send sing command");
+        }
+      })
+      .catch(error => {
+        console.error("Error sending sing command:", error);
+      });
+  };
+
   const handleMicToggle = () => {
     if (!powerOn || !espIP) return;
     
@@ -752,6 +781,7 @@ useEffect(() => {
           </div>
 
           <div className="middle-controls">
+            <div className="middle-top">
             <button 
               className={`action-btn lightning-btn ${lightLevel > 0 ? 'active' : ''}`}
               onClick={handleLightToggle} 
@@ -760,6 +790,14 @@ useEffect(() => {
             >
               <BsLightningFill />
             </button>
+            <button 
+              className="sing-warning-btn"
+              onClick={handleSing} 
+              disabled={!powerOn}
+            >
+              <FaMicrophoneAlt  />
+            </button>
+            </div>
             <button 
               className="warning-btn"
               onClick={handleWarningToggle} 

@@ -116,6 +116,12 @@
     justify-content: center;
     align-items: center;
   }
+  .middle-top {
+    display: flex;
+    justify-content: center;
+    margin-bottom: -5px;
+
+  }
   
   .action-btn {
     background-color: rgba(0, 0, 0, 0.1);
@@ -180,7 +186,33 @@
     background-color: rgba(231, 76, 60, 0.2);
   }
   
-  .warning-btn:disabled {
+  .sing-warning-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .sing-warning-btn {
+    background-color: rgba(231, 76, 60, 0.1);
+    color: #e74c3c;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-top: 5px;
+    margin-right: px;
+
+  }
+  
+  .sing-warning-btn:hover:not(:disabled) {
+    background-color: rgba(231, 76, 60, 0.2);
+  }
+  
+  .sing-warning-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
   }
