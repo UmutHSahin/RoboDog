@@ -237,10 +237,7 @@ useEffect(() => {
       console.log("Camera WebSocket disconnected", event.code, event.reason);
       setCameraConnected(false);
       
-      if (powerOn && cameraEnabled) {
-        console.log("Will attempt to reconnect camera in 2 seconds");
-        setTimeout(connectWebSockets, 2000);
-      }
+
     };
     
     wsCamera.current.onerror = (error) => {
