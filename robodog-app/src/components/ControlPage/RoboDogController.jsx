@@ -360,7 +360,51 @@ useEffect(() => {
       });
   };
   
+  const handleLeft = () => {
 
+    if (!powerOn || !espIP) return;
+    console.log("Moving left");
+    
+    fetch('http://${espIP}/left')
+
+      .then(response => {
+
+        if (response.ok) {
+
+          console.log("Left command sent successfully");
+        } else {
+
+          console.error("Failed to send left command");
+        }
+      })
+      .catch(error => {
+
+        console.error("Error sending left command:", error);
+      });
+  };
+
+  const handleRight = () => {
+
+    if (!powerOn || !espIP) return;
+    console.log("Moving right");
+    
+    fetch('http://${espIP}/right')
+
+      .then(response => {
+
+        if (response.ok) {
+
+          console.log("Right command sent successfully");
+        } else {
+
+          console.error("Failed to send right command");
+        }
+      })
+      .catch(error => {
+
+        console.error("Error sending right command:", error);
+      });
+  };
 
   const handleSpeedClick = (speed) => {
 
@@ -564,39 +608,39 @@ useEffect(() => {
     navigate('/connect');
   };
 
-  const handleExecute = async () => {
-    if (!powerOn) {
-      return Promise.reject(new Error('Power is off or backend IP address is missing'));
+ const handleExecute = async () => {
+  if (!powerOn) {
+    return Promise.reject(new Error('Power is off or backend IP address is missing'));
+  }
+
+  const targetIP = '192.168.1.1'; // ← Buraya uygun IP'yi yaz
+  console.log('Sending execute command to backend at:', targetIP);
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 saniye timeout
+
+  try {
+    const response = await fetch(`https://localhost:44374/api/execute/cmd?ip=${encodeURIComponent(targetIP)}`, {
+      method: 'GET',
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      throw new Error(`Command failed with status: ${response.status}`);
     }
-  
-    const targetIP = '192.168.1.1'; // ← Buraya uygun IP'yi yaz
-    console.log('Sending execute command to backend at:', targetIP);
-  
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 saniye timeout
-  
-    try {
-      const response = await fetch(`https://localhost:44374/api/execute/cmd?ip=${encodeURIComponent(targetIP)}`, {
-        method: 'GET',
-        signal: controller.signal,
-      });
-  
-      clearTimeout(timeoutId);
-  
-      if (!response.ok) {
-        throw new Error(`Command failed with status: ${response.status}`);
-      }
-  
-      const result = await response.json();
-      console.log('Execute command response:', result);
-  
-      return Promise.resolve(result);
-    } catch (error) {
-      console.error('Error sending execute command:', error);
-      return Promise.reject(error);
-    }
-  };
-  
+
+    const result = await response.json();
+    console.log('Execute command response:', result);
+
+    return Promise.resolve(result);
+  } catch (error) {
+    console.error('Error sending execute command:', error);
+    return Promise.reject(error);
+  }
+};
+
 
   
   
@@ -650,7 +694,24 @@ useEffect(() => {
             >
               <RiArrowUpSLine />
             </button>
-
+            <div className="horizontal-controls">
+              <button 
+                onClick={handleLeft} 
+                disabled={!powerOn}
+                className="direction-btn left-btn"
+                style={{ marginRight: "20px"}}
+              >
+                <RiArrowLeftSLine />
+              </button>
+              <button 
+                onClick={handleRight} 
+                disabled={!powerOn}
+                className="direction-btn right-btn"
+                style={{ marginLeft: "20px"}}
+              >
+                <RiArrowRightSLine />
+              </button>
+            </div>
             <button 
               onClick={handleBack} 
               disabled={!powerOn}

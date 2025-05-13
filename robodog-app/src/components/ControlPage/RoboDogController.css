@@ -106,18 +106,7 @@
     opacity: 0.5;
     cursor: not-allowed;
   }
-  .up-btn{
-    margin-bottom: 5px;
-    margin-left: 10px;
-    margin-right: -10px;
 
-  }
-  .down-btn{
-    margin-top: 5px;
-    margin-left: 10px;
-    margin-right: -10px;
-
-  }
   
   .middle-controls {
     display: flex;
