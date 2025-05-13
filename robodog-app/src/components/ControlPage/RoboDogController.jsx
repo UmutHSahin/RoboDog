@@ -52,7 +52,7 @@ const RoboDogController = () => {
     }
 
     
-    if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {  // konuşma tanıma desteği ile alakalı ama şuan çalışmıyor sonra bakıcam
+    if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) { 
 
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       recognitionRef.current = new SpeechRecognition();
@@ -371,13 +371,13 @@ useEffect(() => {
       });
   };
   
+  
   const handleLeft = () => {
 
     if (!powerOn || !espIP) return;
-    console.log("Moving left");
+    console.log("left");
     
-    fetch('http://${espIP}/left')
-
+    fetch(`http://${espIP}/message?text=left`)
       .then(response => {
 
         if (response.ok) {
@@ -396,10 +396,9 @@ useEffect(() => {
   const handleAuto = () => {
 
     if (!powerOn || !espIP) return;
-    console.log("Auto Activated");
+    console.log("auto");
     
-    fetch('http://${espIP}/auto')
-
+    fetch(`http://${espIP}/message?text=auto`)
       .then(response => {
 
         if (response.ok) {
@@ -415,13 +414,13 @@ useEffect(() => {
         console.error("Error sending auto command:", error);
       });
   };
+
   const handleRight = () => {
 
     if (!powerOn || !espIP) return;
-    console.log("Moving right");
+    console.log("right");
     
-    fetch('http://${espIP}/right')
-
+    fetch(`http://${espIP}/message?text=right`)
       .then(response => {
 
         if (response.ok) {
@@ -712,11 +711,7 @@ useEffect(() => {
               <button className="disconnect-camera-btn" onClick={handleDisconnect}>
                 Disconnect
               </button>
-              {micActive && (
-                <div className="listening-indicator">
-                  {listeningText || "Listening..."}
-                </div>
-              )}
+    
             </>
           ) : (
             <div className="camera-error">
@@ -727,11 +722,7 @@ useEffect(() => {
               ) : (
                 <p>Camera cannot be reached at the moment</p>
               )}
-              {micActive && (
-                <div className="listening-indicator">
-                  {listeningText || "Listening..."}
-                </div>
-              )}
+
             </div>
           )}
         </div>
