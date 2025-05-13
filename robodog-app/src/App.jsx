@@ -21,7 +21,6 @@ import ChangePasswordPopup from './components/SettingsPage/ChangePasswordPopup';
 
 import './App.css';
 
-// Set axios base URL for all requests
 axios.defaults.baseURL = 'https://localhost:44374';
 
 const ProtectedRoute = ({ element, isLoggedIn }) => {

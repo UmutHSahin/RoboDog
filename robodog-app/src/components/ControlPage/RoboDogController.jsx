@@ -7,6 +7,7 @@ import { FaDog, FaPaw } from 'react-icons/fa';
 import { GiSittingDog, GiDogHouse } from 'react-icons/gi';
 import { GiDogBowl } from 'react-icons/gi';
 import { GiHand } from 'react-icons/gi';
+import { GiRobotGolem } from 'react-icons/gi';
 
 
 
@@ -382,7 +383,28 @@ useEffect(() => {
         console.error("Error sending left command:", error);
       });
   };
+  const handleAuto = () => {
 
+    if (!powerOn || !espIP) return;
+    console.log("Auto Activated");
+    
+    fetch('http://${espIP}/auto')
+
+      .then(response => {
+
+        if (response.ok) {
+
+          console.log("Auto command sent successfully");
+        } else {
+
+          console.error("Failed to send auto command");
+        }
+      })
+      .catch(error => {
+
+        console.error("Error sending auto command:", error);
+      });
+  };
   const handleRight = () => {
 
     if (!powerOn || !espIP) return;
@@ -699,15 +721,23 @@ useEffect(() => {
                 onClick={handleLeft} 
                 disabled={!powerOn}
                 className="direction-btn left-btn"
-                style={{ marginRight: "20px"}}
+             
               >
                 <RiArrowLeftSLine />
+              </button>
+              <button 
+                onClick={handleAuto} 
+                disabled={!powerOn}
+                className="direction-btn auto-btn"
+                
+              >
+                <GiRobotGolem />
               </button>
               <button 
                 onClick={handleRight} 
                 disabled={!powerOn}
                 className="direction-btn right-btn"
-                style={{ marginLeft: "20px"}}
+                
               >
                 <RiArrowRightSLine />
               </button>

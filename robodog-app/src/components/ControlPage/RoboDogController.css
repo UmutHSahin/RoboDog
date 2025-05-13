@@ -106,7 +106,9 @@
     opacity: 0.5;
     cursor: not-allowed;
   }
-
+.down-btn{
+  margin-top: 5px;
+}
   
   .middle-controls {
     display: flex;
