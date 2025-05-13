@@ -8,7 +8,8 @@ import { GiSittingDog, GiDogHouse } from 'react-icons/gi';
 import { GiDogBowl } from 'react-icons/gi';
 import { GiHand } from 'react-icons/gi';
 import { GiRobotGolem } from 'react-icons/gi';
-import { FaMicrophoneAlt  } from 'react-icons/fa';
+import { GiMusicalNotes } from 'react-icons/gi';
+
 
 
 
@@ -783,7 +784,7 @@ useEffect(() => {
               onClick={handleSing} 
               disabled={!powerOn}
             >
-              <FaMicrophoneAlt  />
+              <GiMusicalNotes  />
             </button>
             </div>
             <button 
